@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "fy2026-q1-2026-06-30",
+  "updatedAt": "2026-08-07",
+  "period": {
+    "label": "2027年3月期 第1四半期",
+    "asOf": "2026-06-30",
+    "asOfLabel": "2026年6月末",
+    "announcementDate": "2026-08-06"
+  },
+  "reported": {
+    "assets": 83.11,
+    "netDebt": 10.81,
+    "nav": 72.3,
+    "ltvPercent": 13,
+    "shares": 5699000000,
+    "sourceId": "q1-investor-presentation"
+  },
+  "scenario": {
+    "version": 3,
+    "targetYear": 2042,
+    "targetNav": 1000,
+    "targetDebt": 150,
+    "sourceId": "agm-2026"
+  },
+  "sources": {
+    "q1-investor-presentation": {
+      "label": "2027年3月期 第1四半期決算 投資家向け説明会資料",
+      "url": "https://group.softbank/media/Project/sbg/sbg/pdf/ir/presentations/2026/investor-presentation_q1fy2026_01_ja.pdf",
+      "publisher": "ソフトバンクグループ株式会社",
+      "publishedAt": "2026-08-06",
+      "pages": "p.3, 8, 11, 55–59",
+      "note": "公式NAV、LTV、保有株式価値、純有利子負債、主要投資先の参照元"
+    },
+    "official-nav-page": {
+      "label": "1株当たりNAV情報",
+      "url": "https://group.softbank/ir/stock/sotp",
+      "publisher": "ソフトバンクグループ株式会社",
+      "publishedAt": "2026-05-13",
+      "pages": "Web",
+      "note": "公式NAVの定常掲載ページ（更新時点では2026年3月末値）"
+    },
+    "agm-2026": {
+      "label": "第46回定時株主総会 事業戦略説明資料",
+      "url": "https://group.softbank/ir/investors/shareholders/2026",
+      "publisher": "ソフトバンクグループ株式会社",
+      "publishedAt": "2026-06-24",
+      "pages": "p.53–54",
+      "note": "2042年NAV 1,000兆円目標の参照元"
+    }
+  },
+  "buckets": [
+    {
+      "id": "arm",
+      "label": "Arm",
+      "current": 49.91,
+      "future": 300,
+      "color": "#2f6fed",
+      "status": "公式NAV内訳",
+      "sourceId": "q1-investor-presentation",
+      "description": "2042年目標ケースでは、ASI時代のCPU・IP・クラウド・エッジ・Physical AI基盤として300兆円を仮定します。",
+      "children": [
+        { "id": "arm-ip", "label": "IP / CSS", "detail": "ライセンス・ロイヤルティー" },
+        { "id": "arm-agi", "label": "Arm AGI CPU", "detail": "自社設計シリコン" },
+        { "id": "arm-cloud", "label": "Cloud AI", "detail": "AWS・Google・Microsoft・NVIDIA" },
+        { "id": "arm-edge", "label": "Edge AI", "detail": "スマホ・PC・IoT" },
+        { "id": "arm-physical", "label": "Physical AI", "detail": "自動車・ロボティクス" }
+      ]
+    },
+    {
+      "id": "svf2",
+      "label": "SVF2 / OpenAI",
+      "current": 19.29,
+      "future": 350,
+      "color": "#8c4ed8",
+      "status": "公式NAV内訳",
+      "sourceId": "q1-investor-presentation",
+      "description": "OpenAIを中心とするAIモデル・エージェント・ロボティクス投資群を、2042年に350兆円と置く分析仮定です。",
+      "children": [
+        { "id": "openai", "label": "OpenAI", "current": 14.55, "detail": "公正価値$89.6Bを期末レートで円換算した参考値", "valueType": "算出参考値", "sourceId": "q1-investor-presentation" },
+        { "id": "revolut", "label": "Revolut", "detail": "デジタル金融" },
+        { "id": "symbotic", "label": "Symbotic", "detail": "物流自動化" },
+        { "id": "agile", "label": "Agile Robots", "detail": "AIロボティクス" },
+        { "id": "skild", "label": "Skild AI", "detail": "ロボット基盤モデル" },
+        { "id": "svf2-other", "label": "その他SVF2", "detail": "成長投資ポートフォリオ" }
+      ]
+    },
+    {
+      "id": "svf1",
+      "label": "SVF1",
+      "current": 3.6,
+      "future": 50,
+      "color": "#ff676a",
+      "status": "公式NAV内訳",
+      "sourceId": "q1-investor-presentation",
+      "description": "既存投資先の成長・上場・再投資を含め、2042年に50兆円を残す分析仮定です。",
+      "children": [
+        { "id": "bytedance", "label": "ByteDance", "detail": "コンテンツ・広告" },
+        { "id": "coupang", "label": "Coupang", "detail": "韓国Eコマース" },
+        { "id": "didi", "label": "DiDi", "detail": "モビリティー" },
+        { "id": "autostore", "label": "AutoStore", "detail": "倉庫自動化" },
+        { "id": "svf1-other", "label": "その他SVF1", "detail": "残存ポートフォリオ" }
+      ]
+    },
+    {
+      "id": "sbkk",
+      "label": "SoftBank Corp.",
+      "current": 2.79,
+      "future": 50,
+      "color": "#62b98f",
+      "status": "公式NAV内訳",
+      "sourceId": "q1-investor-presentation",
+      "description": "国内通信、PayPay・LY、AI導入、米国ネオクラウドの成長を合わせ、2042年に50兆円を仮定します。",
+      "children": [
+        { "id": "telecom", "label": "通信事業", "detail": "SoftBank・Y!mobile・LINEMO" },
+        { "id": "ly", "label": "LY Corporation", "detail": "LINE・Yahoo! JAPAN" },
+        { "id": "paypay", "label": "PayPay", "detail": "決済・銀行・カード" },
+        { "id": "sboai", "label": "SB OAI Japan", "detail": "企業向けOpenAI導入" },
+        { "id": "sbneo", "label": "SB Neo", "detail": "米国ネオクラウド" }
+      ]
+    },
+    {
+      "id": "latam",
+      "label": "LatAm",
+      "current": 1,
+      "future": 15,
+      "color": "#f5a000",
+      "status": "公式NAV内訳",
+      "sourceId": "q1-investor-presentation",
+      "description": "中南米のデジタル経済とIPO・回収再投資を合わせ、2042年に15兆円を仮定します。",
+      "children": [
+        { "id": "rappi", "label": "Rappi", "detail": "配送・金融" },
+        { "id": "kavak", "label": "Kavak", "detail": "中古車流通" },
+        { "id": "quinto", "label": "QuintoAndar", "detail": "不動産テック" },
+        { "id": "latam-other", "label": "その他LatAm", "detail": "地域ポートフォリオ" }
+      ]
+    },
+    {
+      "id": "other",
+      "label": "その他 / 新規AI",
+      "current": 6.51,
+      "future": 380,
+      "color": "#139d9d",
+      "status": "公式NAV内訳",
+      "sourceId": "q1-investor-presentation",
+      "description": "AI半導体、Physical AI、ロボティクス、電力・データセンター、新規投資を束ねる最大の不確実性枠です。",
+      "aggregateChildren": true,
+      "children": [
+        { "id": "intel", "label": "Intel", "current": 1.97, "future": 5, "detail": "期末公正価値1兆9,717億円", "valueType": "公式開示値", "sourceId": "q1-investor-presentation" },
+        { "id": "ampere", "label": "Ampere", "current": null, "future": 60, "detail": "AIサーバーCPU", "valueType": "個別非開示" },
+        { "id": "graphcore", "label": "Graphcore", "current": null, "future": 30, "detail": "AI専用半導体", "valueType": "個別非開示" },
+        { "id": "robo", "label": "Robo HD / Physical AI", "current": null, "future": 120, "detail": "ロボティクス投資群", "valueType": "個別非開示" },
+        { "id": "energy", "label": "Energy Global / SB Energy", "current": null, "future": 120, "detail": "電力・AIデータセンター", "valueType": "個別非開示" },
+        { "id": "northstar", "label": "SB Northstar", "current": null, "future": 5, "detail": "株式・債券運用", "valueType": "個別非開示" },
+        { "id": "direct", "label": "新規・その他直接保有", "current": null, "future": 40, "detail": "将来の新規投資・未配分", "valueType": "個別非開示" }
+      ]
+    },
+    {
+      "id": "tmobile",
+      "label": "T-Mobile",
+      "current": 0,
+      "future": 5,
+      "color": "#8f98a5",
+      "status": "公式NAV内訳",
+      "sourceId": "q1-investor-presentation",
+      "description": "残存持分または再投資効果を含む小口枠として、2042年に5兆円を仮定します。",
+      "children": [
+        { "id": "tmus", "label": "T-Mobile US", "current": 0, "detail": "調整前0.27兆円、カラー契約調整後0.00兆円", "valueType": "公式NAV内訳", "sourceId": "q1-investor-presentation" }
+      ]
+    }
+  ]
+}

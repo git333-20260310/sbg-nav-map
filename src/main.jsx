@@ -1,93 +1,19 @@
 import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
+import navData from './data/nav-data.json';
 
 const TRILLION = 1_000_000_000_000;
-const SHARES = 5_699_000_000;
-const CURRENT_DEBT = 8.21;
-const OFFICIAL_CURRENT_ASSETS = 48.26;
-const OFFICIAL_CURRENT_NAV = 40.06;
-const TARGET_YEAR = 2042;
-const TARGET_NAV = 1000;
-const TARGET_DEBT = 150;
-const SCENARIO_VERSION = 2;
-
-const initialBuckets = [
-  {
-    id: 'arm', label: 'Arm', current: 19.15, future: 300, color: '#2f6fed', status: '報告値',
-    description: '2042年目標ケースでは、ASI時代のCPU・IP・クラウド・エッジ・Physical AI基盤として300兆円を仮定します。',
-    children: [
-      { id: 'arm-ip', label: 'IP / CSS', detail: 'ライセンス・ロイヤルティー' },
-      { id: 'arm-agi', label: 'Arm AGI CPU', detail: '自社設計シリコン' },
-      { id: 'arm-cloud', label: 'Cloud AI', detail: 'AWS・Google・Microsoft・NVIDIA' },
-      { id: 'arm-edge', label: 'Edge AI', detail: 'スマホ・PC・IoT' },
-      { id: 'arm-physical', label: 'Physical AI', detail: '自動車・ロボティクス' },
-    ],
-  },
-  {
-    id: 'svf2', label: 'SVF2 / OpenAI', current: 17.19, future: 350, color: '#8c4ed8', status: '報告値',
-    description: 'OpenAIを中心とするAIモデル・エージェント・ロボティクス投資群を、2042年に350兆円と置く分析仮定です。',
-    children: [
-      { id: 'openai', label: 'OpenAI', detail: 'AIモデル・ChatGPT・Codex' },
-      { id: 'revolut', label: 'Revolut', detail: 'デジタル金融' },
-      { id: 'symbotic', label: 'Symbotic', detail: '物流自動化' },
-      { id: 'agile', label: 'Agile Robots', detail: 'AIロボティクス' },
-      { id: 'skild', label: 'Skild AI', detail: 'ロボット基盤モデル' },
-      { id: 'svf2-other', label: 'その他SVF2', detail: '成長投資ポートフォリオ' },
-    ],
-  },
-  {
-    id: 'svf1', label: 'SVF1', current: 3.38, future: 50, color: '#ff676a', status: '報告値',
-    description: '既存投資先の成長・上場・再投資を含め、2042年に50兆円を残す分析仮定です。',
-    children: [
-      { id: 'bytedance', label: 'ByteDance', detail: 'コンテンツ・広告' },
-      { id: 'coupang', label: 'Coupang', detail: '韓国Eコマース' },
-      { id: 'didi', label: 'DiDi', detail: 'モビリティー' },
-      { id: 'autostore', label: 'AutoStore', detail: '倉庫自動化' },
-      { id: 'svf1-other', label: 'その他SVF1', detail: '残存ポートフォリオ' },
-    ],
-  },
-  {
-    id: 'sbkk', label: 'SoftBank Corp.', current: 2.85, future: 50, color: '#62b98f', status: '報告値',
-    description: '国内通信、PayPay・LY、AI導入、米国ネオクラウドの成長を合わせ、2042年に50兆円を仮定します。',
-    children: [
-      { id: 'telecom', label: '通信事業', detail: 'SoftBank・Y!mobile・LINEMO' },
-      { id: 'ly', label: 'LY Corporation', detail: 'LINE・Yahoo! JAPAN' },
-      { id: 'paypay', label: 'PayPay', detail: '決済・銀行・カード' },
-      { id: 'sboai', label: 'SB OAI Japan', detail: '企業向けOpenAI導入' },
-      { id: 'sbneo', label: 'SB Neo', detail: '米国ネオクラウド' },
-    ],
-  },
-  {
-    id: 'latam', label: 'LatAm', current: 1.04, future: 15, color: '#f5a000', status: '報告値',
-    description: '中南米のデジタル経済とIPO・回収再投資を合わせ、2042年に15兆円を仮定します。',
-    children: [
-      { id: 'rappi', label: 'Rappi', detail: '配送・金融' },
-      { id: 'kavak', label: 'Kavak', detail: '中古車流通' },
-      { id: 'quinto', label: 'QuintoAndar', detail: '不動産テック' },
-      { id: 'latam-other', label: 'その他LatAm', detail: '地域ポートフォリオ' },
-    ],
-  },
-  {
-    id: 'other', label: 'その他 / 新規AI', current: 4.61, future: 380, color: '#139d9d', status: '報告値',
-    description: 'AI半導体、Physical AI、ロボティクス、電力・データセンター、新規投資を束ねる最大の不確実性枠です。',
-    aggregateChildren: true,
-    children: [
-      { id: 'intel', label: 'Intel', current: 0.61, future: 5, detail: '上場株式', source: '2042分析仮定' },
-      { id: 'ampere', label: 'Ampere', current: 1.02, future: 60, detail: 'AIサーバーCPU', source: '2042分析仮定' },
-      { id: 'graphcore', label: 'Graphcore', current: null, future: 30, detail: 'AI専用半導体', source: '2042分析仮定' },
-      { id: 'robo', label: 'Robo HD / Physical AI', current: 0.73, future: 120, detail: 'ロボティクス投資群', source: '2042分析仮定' },
-      { id: 'energy', label: 'Energy Global / SB Energy', current: null, future: 120, detail: '電力・AIデータセンター', source: '2042分析仮定' },
-      { id: 'northstar', label: 'SB Northstar', current: 0.96, future: 5, detail: '株式・債券運用', source: '2042分析仮定' },
-      { id: 'direct', label: '新規・その他直接保有', current: null, future: 40, detail: '将来の新規投資・未配分', source: '2042分析仮定' },
-    ],
-  },
-  {
-    id: 'tmobile', label: 'T-Mobile', current: 0.05, future: 5, color: '#8f98a5', status: '報告値',
-    description: '残存持分または再投資効果を含む小口枠として、2042年に5兆円を仮定します。',
-    children: [{ id: 'tmus', label: 'T-Mobile US', detail: '残存株式・カラー取引' }],
-  },
-];
+const { reported, period, scenario, sources } = navData;
+const SHARES = reported.shares;
+const CURRENT_DEBT = reported.netDebt;
+const OFFICIAL_CURRENT_ASSETS = reported.assets;
+const OFFICIAL_CURRENT_NAV = reported.nav;
+const TARGET_YEAR = scenario.targetYear;
+const TARGET_NAV = scenario.targetNav;
+const TARGET_DEBT = scenario.targetDebt;
+const SCENARIO_VERSION = scenario.version;
+const initialBuckets = navData.buckets;
 
 function Icon({ name, size = 18 }) {
   const paths = {
@@ -107,12 +33,22 @@ const money = (value) => `${format(value)}兆円`;
 const perShare = (nav) => Math.round((nav * TRILLION) / SHARES).toLocaleString('ja-JP');
 const round2 = (value) => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 const cloneInitialBuckets = () => initialBuckets.map((bucket) => ({ ...bucket, children: bucket.children.map((child) => ({ ...child })) }));
+const dateJa = (iso) => new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: 'numeric', day: 'numeric' }).format(new Date(`${iso}T00:00:00+09:00`));
+const hydrateScenario = (saved) => cloneInitialBuckets().map((bucket) => ({
+  ...bucket,
+  future: saved?.futureByBucket?.[bucket.id] ?? bucket.future,
+  aggregateChildren: saved?.aggregateByBucket?.[bucket.id] ?? bucket.aggregateChildren,
+  children: bucket.children.map((child) => ({
+    ...child,
+    future: saved?.futureByChild?.[child.id] ?? child.future,
+  })),
+}));
 
 function Header({ onReset, onSave, onExport, saved }) {
   return (
     <header className="topbar">
       <div className="brand">SBG NAV MAP</div>
-      <div className="asof">基準 2026年3月末 ｜ 目標 {TARGET_YEAR}年</div>
+      <div className="asof">基準 {period.asOfLabel} ｜ 目標 {TARGET_YEAR}年</div>
       <div className="top-actions">
         {saved && <span className="saved-message" role="status">保存しました</span>}
         <button className="button secondary" onClick={onExport}><Icon name="download"/>JSON</button>
@@ -138,7 +74,7 @@ function Summary({ currentNav, futureNav }) {
     <section className="intro">
       <div className="intro-copy">
         <h1>2042年NAV 1,000兆円を、枝から逆算する。</h1>
-        <p>会社目標は2026年6月23日NAV 74兆円の約14倍。マップの現在内訳は3月末40.06兆円、2042年配分は編集可能な分析仮定です。</p>
+        <p>{period.periodLabel || period.label}の公式NAVは{money(currentNav)}。現在値と2042年の編集可能な分析仮定を、同じマップで比較します。</p>
       </div>
       <div className="metrics" aria-label="NAVサマリー">
         <Metric label="現在NAV" value={money(currentNav)} />
@@ -146,6 +82,19 @@ function Summary({ currentNav, futureNav }) {
         <Metric label="増減" value={`${delta >= 0 ? '+' : ''}${format(delta)}兆円`} tone={delta >= 0 ? 'green' : 'red'} />
         <Metric label="1株NAV（株数固定）" value={`${perShare(futureNav)}円`} />
       </div>
+    </section>
+  );
+}
+
+function DisclosureStrip() {
+  const source = sources[reported.sourceId];
+  return (
+    <section className="disclosure-strip" aria-label="データ基準">
+      <div><span>データセット</span><strong>{period.label}</strong></div>
+      <div><span>基準日</span><strong>{dateJa(period.asOf)}</strong></div>
+      <div><span>発表日</span><strong>{dateJa(period.announcementDate)}</strong></div>
+      <div><span>LTV</span><strong>{format(reported.ltvPercent)}%</strong></div>
+      <a href={source.url} target="_blank" rel="noreferrer">一次資料を開く ↗</a>
     </section>
   );
 }
@@ -257,6 +206,7 @@ function Inspector({ bucket, onFutureChange, onChildChange, onToggleAggregate })
         <h2>将来価値を編集</h2>
         <span className="selected-name"><i style={{ background: bucket.color }}/>{bucket.label}</span>
         <p>{bucket.description}</p>
+        {bucket.sourceId && <a className="inline-source" href={sources[bucket.sourceId].url} target="_blank" rel="noreferrer">現在値の出典：{sources[bucket.sourceId].label} ↗</a>}
       </div>
       <div className="value-editor">
         <div className="editor-label"><span>{TARGET_YEAR}年価値（兆円・分析仮定）</span><span>現在比 <strong>{ratio.toFixed(2)}×</strong></span></div>
@@ -280,7 +230,7 @@ function Inspector({ bucket, onFutureChange, onChildChange, onToggleAggregate })
             <i className="child-bullet" style={{ background: bucket.color }}/>
             <div className="child-meta">
               <strong>{child.label}</strong>
-              <small>{child.detail}{child.source ? `・${child.source}` : ''}</small>
+              <small>{child.detail}{child.valueType ? `・${child.valueType}` : ''}</small>
               {child.current !== undefined && <small>現在 {child.current === null ? '非開示' : money(child.current)}</small>}
             </div>
             {child.future !== undefined && <NumberInput value={child.future} onChange={(value) => onChildChange(child.id, value)} ariaLabel={`${child.label}の将来価値`}/>} 
@@ -294,6 +244,30 @@ function Inspector({ bucket, onFutureChange, onChildChange, onToggleAggregate })
         </div>
       )}
     </aside>
+  );
+}
+
+function SourceLedger() {
+  return (
+    <section className="source-ledger">
+      <div className="source-ledger-heading">
+        <div>
+          <span className="eyebrow">SOURCE OF TRUTH</span>
+          <h2>現在値・基準日・出典</h2>
+        </div>
+        <code>src/data/nav-data.json</code>
+      </div>
+      <div className="source-grid">
+        {Object.entries(sources).map(([id, source]) => (
+          <a className="source-card" href={source.url} target="_blank" rel="noreferrer" key={id}>
+            <span>{source.publisher} ｜ {dateJa(source.publishedAt)}</span>
+            <strong>{source.label}</strong>
+            <small>{source.pages} ｜ {source.note}</small>
+          </a>
+        ))}
+      </div>
+      <p>現在値は公式開示、子項目の「算出参考値」は公式開示額を期末為替で換算した補助情報です。個別非開示の項目は0とはみなしていません。</p>
+    </section>
   );
 }
 
@@ -338,7 +312,7 @@ function App() {
       return saved?.version === SCENARIO_VERSION ? saved : null;
     } catch { return null; }
   }, []);
-  const [buckets, setBuckets] = useState(() => savedScenario?.buckets || cloneInitialBuckets());
+  const [buckets, setBuckets] = useState(() => hydrateScenario(savedScenario));
   const [futureDebt, setFutureDebt] = useState(savedScenario?.futureDebt ?? TARGET_DEBT);
   const [selectedId, setSelectedId] = useState('other');
   const [mode, setMode] = useState('future');
@@ -369,12 +343,15 @@ function App() {
     setMode('future');
   };
   const save = () => {
-    localStorage.setItem('sbg-nav-scenario', JSON.stringify({ version: SCENARIO_VERSION, targetYear: TARGET_YEAR, buckets, futureDebt, savedAt: new Date().toISOString() }));
+    const futureByBucket = Object.fromEntries(buckets.map((bucket) => [bucket.id, bucket.future]));
+    const aggregateByBucket = Object.fromEntries(buckets.map((bucket) => [bucket.id, Boolean(bucket.aggregateChildren)]));
+    const futureByChild = Object.fromEntries(buckets.flatMap((bucket) => bucket.children.filter((child) => child.future !== undefined).map((child) => [child.id, child.future])));
+    localStorage.setItem('sbg-nav-scenario', JSON.stringify({ version: SCENARIO_VERSION, datasetId: navData.datasetId, targetYear: TARGET_YEAR, futureByBucket, aggregateByBucket, futureByChild, futureDebt, savedAt: new Date().toISOString() }));
     setSaved(true);
     window.setTimeout(() => setSaved(false), 1800);
   };
   const exportJson = () => {
-    const blob = new Blob([JSON.stringify({ version: SCENARIO_VERSION, asOf: '2026-03-31', targetYear: TARGET_YEAR, targetNav: TARGET_NAV, buckets, currentDebt: CURRENT_DEBT, futureDebt, currentNav, futureNav }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ version: SCENARIO_VERSION, datasetId: navData.datasetId, asOf: period.asOf, sourceId: reported.sourceId, targetYear: TARGET_YEAR, targetNav: TARGET_NAV, buckets, currentAssets: OFFICIAL_CURRENT_ASSETS, currentDebt: CURRENT_DEBT, futureDebt, currentNav, futureNav }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
@@ -388,6 +365,7 @@ function App() {
       <Header onReset={reset} onSave={save} onExport={exportJson} saved={saved}/>
       <main>
         <Summary currentNav={OFFICIAL_CURRENT_NAV} futureNav={futureNav}/>
+        <DisclosureStrip/>
         <ModeSwitch mode={mode} onChange={setMode}/>
         <div className="workspace">
           <MindMap buckets={buckets} selectedId={selectedId} onSelect={setSelectedId} mode={mode} zoom={zoom} onZoom={setZoom}/>
@@ -403,9 +381,10 @@ function App() {
             <span><i className="calculated"/>自動計算</span>
           </div>
         </section>
+        <SourceLedger/>
         <footer>
-          <p>現在値は2026年3月末の公式NAV。2042年1,000兆円は会社目標、各資産への配分・純負債150兆円・株数固定は分析仮定です。</p>
-          <div className="source-links"><a href="https://group.softbank/ir/stock/sotp" target="_blank" rel="noreferrer">公式NAV</a><a href="https://group.softbank/ir/investors/shareholders/2026" target="_blank" rel="noreferrer">2026年株主総会</a></div>
+          <p>現在値は{period.asOfLabel}の公式NAV。2042年1,000兆円は会社目標、資産配分・純負債150兆円・株数固定は分析仮定です。データ更新 {dateJa(navData.updatedAt)}</p>
+          <div className="source-links"><a href={sources['official-nav-page'].url} target="_blank" rel="noreferrer">公式NAV</a><a href={sources['agm-2026'].url} target="_blank" rel="noreferrer">2026年株主総会</a></div>
         </footer>
       </main>
     </div>
