@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 import navData from './data/nav-data.json';
+import newsUpdates from './data/news-updates.json';
 
 const TRILLION = 1_000_000_000_000;
 const { reported, period, scenario, sources } = navData;
@@ -73,12 +74,12 @@ function Summary({ currentNav, futureNav }) {
   return (
     <section className="intro">
       <div className="intro-copy">
-        <h1>2042年NAV 1,000兆円を、枝から逆算する。</h1>
-        <p>{period.periodLabel || period.label}の公式NAVは{money(currentNav)}。現在値と2042年の編集可能な分析仮定を、同じマップで比較します。</p>
+        <h1>公式発表を基本に、最新ニュースを重ねる。</h1>
+        <p>{period.periodLabel || period.label}の公式NAVは{money(currentNav)}。最新ニュースは、更新を依頼したときに出典・日付付きで反映します。将来の試算は「将来」へ切り替えて確認できます。</p>
       </div>
       <div className="metrics" aria-label="NAVサマリー">
-        <Metric label="現在NAV" value={money(currentNav)} />
-        <Metric label={`${TARGET_YEAR}年NAV`} value={money(futureNav)} tone="violet" />
+        <Metric label="公式NAV" value={money(currentNav)} />
+        <Metric label={`${TARGET_YEAR}年NAV（試算）`} value={money(futureNav)} tone="violet" />
         <Metric label="増減" value={`${delta >= 0 ? '+' : ''}${format(delta)}兆円`} tone={delta >= 0 ? 'green' : 'red'} />
         <Metric label="1株NAV（株数固定）" value={`${perShare(futureNav)}円`} />
       </div>
@@ -247,6 +248,27 @@ function Inspector({ bucket, onFutureChange, onChildChange, onToggleAggregate })
   );
 }
 
+
+function NewsUpdates() {
+  return (
+    <section className="source-ledger" aria-label="依頼して反映した最新ニュース">
+      <h2>最新ニュース・更新履歴</h2>
+      <p>このNAVページのニュースは、ChatGPTに更新を依頼したときに反映します。公式NAVの基準日と、ニュースの発表日を分けて記録します。</p>
+      {newsUpdates.length ? <div className="source-grid">{newsUpdates.map(item => (
+        <article className="source-card" key={item.id}>
+          <span>{dateJa(item.publishedAt)} ｜ {item.status} ｜ 反映 {dateJa(item.reflectedAt)}</span>
+          <strong>{item.title}</strong>
+          <p>{item.summary}</p>
+          <small>反映内容：{item.impact}</small>
+          <a href={item.url} target="_blank" rel="noreferrer">{item.publisher}の資料を開く ↗</a>
+        </article>
+      ))}</div> : <p>ニュースの追加はまだありません。「この報道をNAVページに反映して」と、リンクや記事を添えて依頼できます。</p>}
+      <p>企業全体の評価額とSBGの保有分は別です。NAVへの試算反映には、持分比率・為替・既存計上額などの根拠を記録し、公式値と区別します。</p>
+      <a href="./network.html">企業・計画のネットワーク図を見る ↗</a>
+    </section>
+  );
+}
+
 function SourceLedger() {
   return (
     <section className="source-ledger">
@@ -255,7 +277,7 @@ function SourceLedger() {
           <span className="eyebrow">SOURCE OF TRUTH</span>
           <h2>現在値・基準日・出典</h2>
         </div>
-        <code>src/data/nav-data.json</code>
+        <span>公式開示の基準と資料</span>
       </div>
       <div className="source-grid">
         {Object.entries(sources).map(([id, source]) => (
@@ -315,7 +337,7 @@ function App() {
   const [buckets, setBuckets] = useState(() => hydrateScenario(savedScenario));
   const [futureDebt, setFutureDebt] = useState(savedScenario?.futureDebt ?? TARGET_DEBT);
   const [selectedId, setSelectedId] = useState('other');
-  const [mode, setMode] = useState('future');
+  const [mode, setMode] = useState('current');
   const [zoom, setZoom] = useState(1);
   const [saved, setSaved] = useState(false);
   const currentAssets = buckets.reduce((sum, item) => sum + item.current, 0);
@@ -366,6 +388,7 @@ function App() {
       <main>
         <Summary currentNav={OFFICIAL_CURRENT_NAV} futureNav={futureNav}/>
         <DisclosureStrip/>
+        <NewsUpdates/>
         <ModeSwitch mode={mode} onChange={setMode}/>
         <div className="workspace">
           <MindMap buckets={buckets} selectedId={selectedId} onSelect={setSelectedId} mode={mode} zoom={zoom} onZoom={setZoom}/>
