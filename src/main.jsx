@@ -387,6 +387,11 @@ function App() {
       <Header onReset={reset} onSave={save} onExport={exportJson} saved={saved}/>
       <main>
         <Summary currentNav={OFFICIAL_CURRENT_NAV} futureNav={futureNav}/>
+        <section className="disclosure-strip" aria-label="評価額と1株NAVの関係" style={{borderColor:'#267d79',background:'#effaf8',display:'block',fontSize:'16px',lineHeight:1.8}}>
+          <strong style={{fontSize:'20px',whiteSpace:'normal'}}>SBGの保有資産の評価額が1兆円増えると、1株NAVは約{perShare(1)}円増加</strong>
+          <p style={{margin:'8px 0 0'}}>純負債・株数が変わらない場合、NAV総額は1兆円増えます。計算：1兆円 ÷ {SHARES.toLocaleString('ja-JP')}株。</p>
+          <p style={{margin:'4px 0 0',fontSize:'13px'}}>投資先の会社全体の評価額が1兆円増える場合は、SBGの持分比率を掛けます。例えば持分10%なら、1株NAVの増加は約{perShare(0.1)}円です。株価の上昇額を示すものではありません。</p>
+        </section>
         <DisclosureStrip/>
         <NewsUpdates/>
         <ModeSwitch mode={mode} onChange={setMode}/>
