@@ -1,0 +1,131 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SBGのネットワーク図</title><style>:root{--background:#fff;--foreground:#202733;--muted-foreground:#637182;--viz-series-1:#2677b6;--viz-series-2:#16877d;--viz-series-3:#b97913;--viz-series-4:#9055a7;--font-size-base:14px}*{box-sizing:border-box}body{margin:0;padding:24px;font-family:system-ui,sans-serif;background:var(--background);color:var(--foreground)}h2{font-size:23px;font-weight:500}.viz-row{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin:12px 0}.text-small{font-size:12px;color:var(--muted-foreground)}select,button{font:inherit;padding:7px 10px;border:1px solid #ccd3db;border-radius:6px;background:var(--background);color:var(--foreground)}button{cursor:pointer}a{color:var(--viz-series-1)}@media(prefers-color-scheme:dark){:root{--background:#161b23;--foreground:#e4e8ed;--muted-foreground:#a2adba;--viz-series-1:#72b7ed;--viz-series-2:#65c9ba;--viz-series-3:#edb65c;--viz-series-4:#c799e3}}</style></head><body><div id="sbg-network">
+  <h2>SBGの企業・計画・話題のネットワーク</h2>
+  <div class="viz-row text-small" aria-label="線の凡例">
+    <span class="sbg-key" style="--k:var(--viz-series-1)">━ 資本・投資</span>
+    <span class="sbg-key" style="--k:var(--viz-series-2)">━ 公表された参加・技術関係</span>
+    <span class="sbg-key" style="--k:var(--viz-series-3)">┄ 報道</span>
+    <span class="sbg-key" style="--k:var(--viz-series-4)">┄ 将来の接点・関連テーマ</span>
+  </div>
+  <div class="sbg-layout"><div class="sbg-plot"></div><aside class="sbg-panel" aria-label="企業と関係の説明"><h3>企業・計画の説明</h3>
+  <div class="viz-row">
+    <label class="form-label" for="sbg-select">企業・計画を選ぶ <select class="form-select" id="sbg-select"></select></label>
+  </div>
+  <div id="sbg-detail" aria-live="polite"></div>
+  <div class="text-small">2026年10月9日確認／主要関係を抜粋。点の大きさは、この図に載せた接続数。距離・線の太さは持分比率や金額を示しません。</div>
+</aside></div></div>
+<style>
+#sbg-network .sbg-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start}
+#sbg-network .sbg-panel{position:sticky;top:16px;padding:18px;border:1px solid var(--muted-foreground);border-radius:12px;max-height:calc(100vh - 32px);overflow:auto}
+#sbg-network .sbg-panel h3{font-size:18px;font-weight:500;margin:0 0 12px}
+#sbg-network .sbg-panel select{width:100%;margin-top:8px}
+#sbg-network .sbg-relations button{width:100%;text-align:left;white-space:normal;line-height:1.6}
+@media(max-width:780px){#sbg-network .sbg-layout{display:flex;flex-direction:column}#sbg-network .sbg-panel{position:static;width:100%;max-height:none;order:-1}}
+#sbg-network .sbg-key{color:var(--k)}
+#sbg-network .sbg-plot{width:100%;touch-action:pan-y}
+#sbg-network svg{display:block;width:100%;color:var(--foreground)}
+#sbg-network .sbg-edge{fill:none;stroke-width:1.2}
+#sbg-network .sbg-node circle{stroke:var(--background);stroke-width:2}
+#sbg-network .sbg-node text{fill:var(--foreground);paint-order:stroke;stroke:var(--background);stroke-width:3px;stroke-linejoin:round;font-size:var(--font-size-base);font-weight:400}
+#sbg-network .sbg-node text.sbg-secondary{font-size:calc(var(--font-size-base) * .86)}
+#sbg-network .sbg-sector{fill:var(--muted-foreground);font-size:var(--font-size-base)}
+#sbg-network #sbg-detail{margin:12px 0;min-height:54px}
+#sbg-network .sbg-relations{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+</style>
+<script>
+(() => {
+ const root=document.getElementById('sbg-network'),plot=root.querySelector('.sbg-plot'),select=root.querySelector('#sbg-select'),detail=root.querySelector('#sbg-detail');
+ const base='https://group.softbank/en/';
+ const nodes=[
+ ['sbg','SoftBank Group','中核','投資とグループ戦略の中心。SoftBank株式会社とは別会社。',.49,.47,base+'about/group'],
+ ['svf','Vision Fund 2','資金','技術企業に出資する投資ファンド。',.28,.44,base+'about/group'],
+ ['db','DigitalBridge','資金','2026年9月にSBGが買収完了。デジタルインフラの投資・運用会社。',.16,.50,base+'news/press/20260930'],
+ ['bank','銀行・外部投資家','資金','外部の資金提供者という関連テーマ。特定の銀行と個別案件の融資契約を示していない。',.08,.59,''],
+ ['vantage','Vantage','資金','DigitalBridgeの投資先。運用するファンド等を通じた関係で、SBGの単純な直営拠点と同一視しない。',.10,.43,'https://vantage-dc.com/company/'],
+ ['malaysia','マレーシアDC','計画','ジョホール。Vantageが旧Yondrの300MW超キャンパスを取得。Stargateとは別の拠点。',.06,.34,'https://vantage-dc.com/company/'],
+ ['sbe','SB Energy','インフラ','電力とデータセンターの開発・建設・運営を担うグループ企業。',.38,.29,'https://sbenergy.com/'],
+ ['stargate','Stargate','インフラ','OpenAI向けAIインフラのプロジェクト。SBGの子会社という意味の点ではない。拠点ごとに事業者と役割が異なる。',.54,.23,'https://openai.com/index/five-new-stargate-sites/'],
+ ['openai','OpenAI','AI','SBG／SVF2の投資先。AIモデルとサービスを開発。',.65,.37,base+'news/press/20260227'],
+ ['oracle','Oracle','外部','外部企業。Stargateでクラウド・計算基盤などに関与。',.64,.18,'https://openai.com/index/five-new-stargate-sites/'],
+ ['nvidia','NVIDIA','外部','外部企業。GPU・AI計算設備の供給などで複数案件に関与。',.73,.21,'https://openai.com/index/introducing-stargate-uae/'],
+ ['mgx','MGX','外部','Stargateの当初発表における資金パートナー。',.57,.10,base+'news/press/20250122'],
+ ['milam','テキサス・Milam','計画','OpenAIがSB Energyを建設・運営パートナーに選定したデータセンター案件。',.40,.16,'https://openai.com/index/stargate-sb-energy-partnership/'],
+ ['abilene','テキサス・Abilene','計画','Stargateの最初の拠点。Milamとは別案件・別の開発体制。',.48,.11,'https://openai.com/index/five-new-stargate-sites/'],
+ ['ohio','オハイオ・PORTS-Pike','計画','大規模電力・AIキャンパス計画。10GW電力構想と8 IT-GWのAI設備を区別する。',.30,.10,'https://portscampus.com/'],
+ ['aep','AEP','外部','オハイオ計画の電力網に関わる外部企業。',.21,.08,'https://portscampus.com/'],
+ ['france','フランスDC計画','計画','全体5GW構想。初期の北部3拠点3.1GWとBosquel 1GWは重複して数えない。',.22,.24,base+'news/press/20260531_0'],
+ ['sesterce','Sesterce','外部','SBGとの合弁でBosquelの1GW開発・運営を計画。',.10,.17,base+'news/press/20260531'],
+ ['edf','EDF','外部','フランス計画に関わる電力・用地側の外部パートナー。',.12,.25,base+'news/press/20260531_0'],
+ ['schneider','Schneider Electric','外部','フランス計画の設備側の外部パートナー。',.14,.09,base+'news/press/20260531_0'],
+ ['uae','Stargate UAE','計画','アブダビの1GWクラスター計画。5GWのキャンパス全体とは区別。',.80,.12,base+'news/press/20250522'],
+ ['g42','G42','外部','Stargate UAEで建設を担う外部パートナー。',.90,.08,base+'news/press/20250522'],
+ ['cisco','Cisco','外部','Stargate UAEで接続・セキュリティ基盤に関与。',.91,.18,base+'news/press/20250522'],
+ ['terabase','Terabase Energy','ロボット','投資先。太陽光発電所の建設をロボット・ソフトウエアで自動化。',.31,.21,'https://www.terabase.energy/'],
+ ['roze','Roze','報道','データセンター建設をロボットで効率化する新会社構想・IPO準備の報道。確定した全拠点の請負関係ではない。',.46,.34,'https://www.reuters.com/business/media-telecom/softbank-plans-list-new-ai-robotics-company-us-ft-reports-2026-04-29/'],
+ ['ipo','IPO・資金循環','報道','SB Energy・Rozeの上場準備やOpenAIの上場時期を巡る報道。実現時期や成功を保証しない。',.20,.39,'https://www.reuters.com/world/softbank-hires-banks-us-ipos-sb-energy-ai-robotics-spinoff-roze-sources-say-2026-05-26/'],
+ ['arm','Arm','半導体','SBGの子会社。CPUの設計技術に加えてArm AGI CPUという自社製品へ展開。',.33,.62,base+'ir/financials/annual_reports/2026/message/arm'],
+ ['ampere','Ampere','半導体','SBGの子会社。Arm技術を使うサーバーCPUを設計。',.19,.65,base+'news/press/20251126'],
+ ['graphcore','Graphcore','半導体','SBGの子会社。AI用半導体の設計・開発。',.28,.75,base+'about/group'],
+ ['intel','Intel','半導体','SBGが20億ドル出資契約を発表。子会社ではなく投資の接点。',.12,.72,base+'news/press/20250819'],
+ ['rapidus','Rapidus','半導体','SoftBank株式会社が出資。千歳で2nm半導体・2027年量産を目標。Arm製品の製造受託を示す線ではない。',.17,.84,'https://www.rapidus.inc/news_topics/news-info/rapidus-secures-267-6-billion-yen-in-funding-from-japan-government-and-private-sector-companies/'],
+ ['ibm','IBM','外部','Rapidusの技術開発パートナー。',.07,.88,'https://www.rapidus.inc/en/'],
+ ['sb','SoftBank株式会社','日本','SBGの子会社。日本の通信、法人顧客、AIインフラとサービスを展開。',.65,.62,'https://www.softbank.jp/en/corp/ir/at_a_glance/'],
+ ['jvai','SB OAI Japan','日本','SoftBank側とOpenAIの合弁。国内企業向けAIの導入・運用支援。中間持株会社は省略。',.78,.49,base+'news/press/20251105'],
+ ['noetra','Noetra','日本','SoftBank・ソニー・NEC・Hondaが中核の共同出資会社。国産マルチモーダルAIを開発。OpenAIとは別モデル。',.78,.69,'https://www.softbank.jp/corp/news/press/sbkk/2026/20260716_01/'],
+ ['sony','ソニー','外部','Noetraの中核出資企業。',.89,.66,'https://www.softbank.jp/corp/news/press/sbkk/2026/20260716_01/'],
+ ['nec','NEC','外部','Noetraの中核出資企業。',.94,.74,'https://www.softbank.jp/corp/news/press/sbkk/2026/20260716_01/'],
+ ['honda','Honda','外部','Noetraの中核出資企業。',.87,.81,'https://www.softbank.jp/corp/news/press/sbkk/2026/20260716_01/'],
+ ['tomakomai','苫小牧AI DC','日本','SoftBank株式会社の国内AIデータセンター計画。Rapidusの千歳工場とは別施設。',.92,.50,'https://www.softbank.jp/en/sbnews/entry/20260225_01'],
+ ['sakai','堺AI DC','日本','SoftBank株式会社のAIデータセンター計画。',.91,.57,'https://www.softbank.jp/en/sbnews/entry/20250303_01'],
+ ['ly','LINEヤフー','日本','SoftBank傘下。中間持株会社A HoldingsやNAVERとの構造は省略。',.68,.84,'https://www.softbank.jp/en/corp/ir/at_a_glance/'],
+ ['paypay','PayPay','日本','SoftBankグループの決済事業。B Holdings等を含む資本構造は省略。',.78,.90,'https://www.softbank.jp/en/corp/ir/at_a_glance/'],
+ ['robot','SoftBank Robotics','ロボット','グループのロボット導入・連携の担い手。',.54,.73,'https://www.softbankrobotics.com/'],
+ ['robohd','Robo HD','ロボット','ロボット関連投資をまとめる中間持株会社。個別持分や全投資先は省略。',.50,.59,base+'ir/investors/management_policy'],
+ ['abb','ABB Robotics','ロボット','産業ロボット事業の買収契約。ここで確認した資料では完了未確認。Stargate建設への採用確定とは別。',.43,.87,base+'news/press/20251008'],
+ ['skild','Skild AI','ロボット','ロボットの基盤モデルを開発する投資先。',.60,.92,'https://skild.ai/blogs/series-c'],
+ ['agile','Agile Robots','ロボット','ロボット関連投資先。',.51,.93,base+'news/press/20251008'],
+ ['onex','1X','ロボット','身体を持つAI・ロボット分野の投資先。個別のOpenAI製品接続を示さない。',.69,.94,base+'ir/investors/management_policy'],
+ ['autostore','AutoStore','物流','自動倉庫の投資先。物流自動化の公表された連携例に含まれる。',.45,.77,'https://www.softbankrobotics.com/jp/news/press/20251211a/'],
+ ['berkshire','Berkshire Grey','物流','グループのピッキング・仕分けの技術。',.59,.84,'https://www.softbankrobotics.com/jp/news/press/20251211a/'],
+ ['balyo','BALYO','物流','グループの自動フォークリフト。',.36,.91,'https://www.softbankrobotics.com/jp/news/press/20251211a/'],
+ ['frameworks','SBフレームワークス','物流','SoftBank RoboticsがAutoStore等の物流自動化を提供する公表例。',.72,.76,'https://www.softbankrobotics.com/jp/news/press/20251211a/'],
+ ['wayve','Wayve','ロボット','運転AIの投資先。OpenAIとの連携確定を示すものではない。',.75,.33,base+'philosophy/dreams/transportation-and-logistics/wayve'],
+ ['tempus','SB TEMPUS','AI','SBGとTempusが設立した医療データ・AIの合弁。',.87,.37,base+'news/press/20240627'],
+ ['tempusUS','Tempus','外部','SB TEMPUSの合弁相手。',.94,.31,base+'news/press/20240627'],
+ ['future','設備づくりの自動化','構想','ロボット・AI・建設の能力を結び付ける将来像。個別の採用契約は未確認。',.40,.46,'']
+ ].map(([id,name,group,description,x,y,url])=>({id,name,group,description,x,y,url}));
+ const edges=[];const link=(a,b,type,label)=>edges.push({a,b,type,label});
+ ['svf','db','sbe','arm','ampere','graphcore','robohd','sb'].forEach(n=>link('sbg',n,0,'資本・グループ関係（中間会社省略）'));
+ link('sbg','openai',0,'SVF2等を通じた投資');link('svf','openai',0,'出資');link('svf','terabase',0,'出資');link('sbg','intel',0,'20億ドルの出資契約');link('sbg','wayve',0,'投資先');link('sbg','tempus',0,'合弁');link('tempusUS','tempus',0,'合弁');
+ link('db','vantage',0,'投資先・運用ファンド等を通じた関係');link('vantage','malaysia',1,'旧Yondrジョホール拠点を取得');link('bank','db',3,'外部資金と運用の接点');link('bank','sbe',3,'開発資金という関連テーマ');
+ ['sbe','openai','oracle','nvidia','mgx','sbg'].forEach(n=>link(n,'stargate',1,'Stargateに関与（役割・拠点は異なる）'));
+ link('sbe','milam',1,'建設・運営');link('openai','milam',1,'計算基盤を利用');link('stargate','milam',1,'拠点');link('stargate','abilene',1,'拠点');link('oracle','abilene',1,'計算基盤');
+ ['sbe','openai','nvidia','aep'].forEach(n=>link(n,'ohio',1,'公表された計画への関与'));
+ ['sbg','sbe','sesterce','edf','schneider'].forEach(n=>link(n,'france',1,'フランス開発計画への関与'));
+ ['sbg','openai','oracle','nvidia','g42','cisco'].forEach(n=>link(n,'uae',1,'Stargate UAEへの参加'));
+ link('sbe','terabase',3,'電力設備建設と建設自動化の接点');link('sbg','roze',2,'新会社構想の報道');link('roze','stargate',3,'AIデータセンター建設の構想');link('roze','future',3,'建設自動化の将来像');
+ ['sbe','openai','roze'].forEach(n=>link(n,'ipo',2,'上場準備・時期に関する報道'));
+ link('arm','ampere',1,'Arm技術を利用');link('sb','rapidus',0,'出資');link('ibm','rapidus',1,'技術開発');link('rapidus','arm',3,'設計・製造の関連テーマ／製造受託は未確認');
+ link('sb','noetra',0,'中核出資企業');['sony','nec','honda'].forEach(n=>link(n,'noetra',0,'中核出資企業'));link('nvidia','noetra',1,'計算基盤構築の協力計画');link('noetra','future',3,'実世界AIの将来用途');
+ link('sb','jvai',0,'SoftBank側の合弁（C Holdings省略）');link('openai','jvai',0,'合弁');link('openai','jvai',1,'AI製品・技術');['tomakomai','sakai'].forEach(n=>link('sb',n,1,'国内AIデータセンター計画'));['ly','paypay'].forEach(n=>link('sb',n,0,'傘下・間接の資本構造を省略'));link('ly','paypay',0,'共同持株会社等を通じた関係');
+ ['robot','skild','agile','onex','autostore','berkshire','balyo'].forEach(n=>link('robohd',n,0,'ロボット関連事業・投資（持分構造省略）'));
+ link('sbg','abb',0,'買収契約／完了未確認');link('abb','future',3,'産業ロボットと建設の将来用途');link('skild','future',3,'ロボットの頭脳を使う将来像');link('robot','frameworks',1,'物流自動化を提供');['autostore','berkshire','balyo'].forEach(n=>link(n,'frameworks',1,'公表された物流自動化の組み合わせ'));
+ const map=new Map(nodes.map(n=>[n.id,n]));nodes.forEach(n=>{n.degree=edges.filter(e=>e.a===n.id||e.b===n.id).length});
+ let chosen=null;let svg;let width=736;const ns='http://www.w3.org/2000/svg';const el=(tag,attrs={})=>{const e=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));return e};
+ const colors=['var(--viz-series-1)','var(--viz-series-2)','var(--viz-series-3)','var(--viz-series-4)'];
+ const groupColor=n=>n.group==='報道'||n.group==='構想'?colors[2]:n.group==='外部'?'var(--muted-foreground)':n.group==='計画'?colors[1]:colors[0];
+ const titles=['資本・投資','公表された関係','報道','構想・関連テーマ'];
+ const option=document.createElement('option');option.value='';option.textContent='全体';select.appendChild(option);
+ nodes.slice().sort((a,b)=>a.name.localeCompare(b.name,'ja')).forEach(n=>{const o=document.createElement('option');o.value=n.id;o.textContent=n.name;select.appendChild(o)});
+ function pick(id){chosen=id||null;select.value=id||'';draw();if(!chosen){detail.textContent='点を選ぶと、直接つながる相手と関係の内容が表示されます。';return}const n=map.get(chosen);detail.replaceChildren();const strong=document.createElement('strong');strong.textContent=n.name+'：';detail.appendChild(strong);detail.appendChild(document.createTextNode(n.description+' '));if(n.url){const a=document.createElement('a');a.href=n.url;a.target='_blank';a.rel='noopener';a.textContent='資料';detail.appendChild(a)}const list=document.createElement('div');list.className='sbg-relations';edges.filter(e=>e.a===chosen||e.b===chosen).forEach(e=>{const other=map.get(e.a===chosen?e.b:e.a);const b=document.createElement('button');b.type='button';b.className='btn btn-ghost';b.textContent=other.name+' ／ '+titles[e.type]+' — '+e.label;b.dataset.tooltip=e.label;b.addEventListener('click',()=>pick(other.id));list.appendChild(b)});detail.appendChild(list)}
+ function draw(){width=Math.max(300,plot.clientWidth);const height=width<500?820:760;const pad=35;const positions=nodes.map(n=>({n,x:pad+n.x*(width-2*pad),y:pad+n.y*(height-2*pad)}));
+ // Collision relaxation keeps labels apart while retaining the thematic neighborhoods.
+ for(let k=0;k<160;k++){for(let i=0;i<positions.length;i++){const a=positions[i];for(let j=i+1;j<positions.length;j++){const b=positions[j];const dx=a.x-b.x,dy=a.y-b.y;const lx=width<500?45:65; if(Math.abs(dx)<lx*1.8&&Math.abs(dy)<33){const overlap=33-Math.abs(dy);const direction=dy===0?(i%2?1:-1):Math.sign(dy);a.y+=direction*overlap*.18;b.y-=direction*overlap*.18}}a.x+=((pad+a.n.x*(width-2*pad))-a.x)*.02;a.y+=((pad+a.n.y*(height-2*pad))-a.y)*.008;a.y=Math.max(25,Math.min(height-35,a.y))}}
+ const p=new Map(positions.map(p=>[p.n.id,p]));svg=el('svg',{viewBox:'0 0 '+width+' '+height,height,role:'img','aria-label':'SBGと主要企業・計画・報道のネットワーク。企業選択欄で各点の関係を確認できます。'});svg.addEventListener('click',()=>pick(''));
+ const adjacent=new Set(chosen?[chosen,...edges.filter(e=>e.a===chosen||e.b===chosen).map(e=>e.a===chosen?e.b:e.a)]:nodes.map(n=>n.id));
+ edges.forEach(e=>{const a=p.get(e.a),b=p.get(e.b);const active=chosen&&(e.a===chosen||e.b===chosen);const path=el('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:colors[e.type],opacity:chosen?(active?1:.10):.45,'stroke-width':active?2:1.2,...(e.type>=2?{'stroke-dasharray':'5 4'}:{})});path.classList.add('sbg-edge');svg.appendChild(path)});
+ positions.forEach(({n,x,y})=>{const degree=n.degree;const r=Math.min(16,4+Math.sqrt(degree)*2);const g=el('g',{transform:'translate('+x+' '+y+')',opacity:adjacent.has(n.id)?1:.22});g.classList.add('sbg-node','cursor-interaction');const hit=el('circle',{r:22,fill:'transparent'});g.appendChild(hit);const circle=el('circle',{r,fill:groupColor(n)});g.appendChild(circle);const text=el('text',{x:0,y:r+15,'text-anchor':'middle'});text.textContent=n.name;if(x<90){text.setAttribute('text-anchor','start');text.setAttribute('x',-r)}else if(x>width-100){text.setAttribute('text-anchor','end');text.setAttribute('x',r)}
+ const show=width>=600||n.degree>=5||adjacent.has(n.id)&&chosen||n.id==='malaysia'||n.id==='noetra'||n.id==='rapidus';if(show){text.classList.add('sbg-secondary');g.appendChild(text)}const title=el('title');title.textContent=n.name+'：'+n.description;g.appendChild(title);g.addEventListener('click',e=>{e.stopPropagation();pick(n.id)});svg.appendChild(g)});plot.replaceChildren(svg)}
+ select.addEventListener('change',()=>pick(select.value));new ResizeObserver(()=>draw()).observe(plot);pick('sbg');
+})();
+</script>
+</body></html>
