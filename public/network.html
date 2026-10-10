@@ -11,8 +11,8 @@
     <label class="form-label" for="sbg-select">企業・計画を選ぶ <select class="form-select" id="sbg-select"></select></label>
   </div>
   <div id="sbg-detail" aria-live="polite"></div>
-  <div class="text-small">2026年10月9日確認／主要関係を抜粋。点の大きさは、この図に載せた接続数。距離・線の太さは持分比率や金額を示しません。</div>
-</aside></div></div>
+  <div class="text-small">2026年10月10日確認／主要関係を抜粋。点の大きさは、この図に載せた接続数。距離・線の太さは持分比率や金額を示しません。</div>
+</aside></div><section aria-label="更新履歴"><h3>更新履歴</h3><p>2026年10月10日：10月9日の新AIファンド構想報道を追加。湾岸投資家との関係は報道の破線で表示。調達完了・個別参加者は未確定。<a href="https://www.reuters.com/world/asia-pacific/softbank-seeks-100-billion-gulf-investors-ft-reports-2026-10-09/" target="_blank" rel="noopener">Reuters（FT報道を紹介）</a></p></section></div>
 <style>
 #sbg-network .sbg-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start}
 #sbg-network .sbg-panel{position:sticky;top:16px;padding:18px;border:1px solid var(--muted-foreground);border-radius:12px;max-height:calc(100vh - 32px);overflow:auto}
@@ -36,6 +36,8 @@
  const root=document.getElementById('sbg-network'),plot=root.querySelector('.sbg-plot'),select=root.querySelector('#sbg-select'),detail=root.querySelector('#sbg-detail');
  const base='https://group.softbank/en/';
  const nodes=[
+ ['gulf-fund','新AIファンド構想','報道','2026年10月9日報道。湾岸投資家から最大1,000億ドルの調達を検討し、企業買収とAIによる業務改善に使う構想。FT報道をReutersが紹介。Reutersは独自確認できておらず、調達完了・参加者・持分は未確定。',.23,.55,'https://www.reuters.com/world/asia-pacific/softbank-seeks-100-billion-gulf-investors-ft-reports-2026-10-09/'],
+ ['gulf-investors','湾岸投資家','報道','新AIファンド構想で協議相手と報じられた投資家。UAEの有力者との協議報道があるが、個別出資者・金額は確定していない。SVF1の既存出資者と同一とは断定しない。',.10,.64,'https://www.reuters.com/world/asia-pacific/softbank-seeks-100-billion-gulf-investors-ft-reports-2026-10-09/'],
  ['sbg','SoftBank Group','中核','投資とグループ戦略の中心。SoftBank株式会社とは別会社。',.49,.47,base+'about/group'],
  ['svf','Vision Fund 2','資金','技術企業に出資する投資ファンド。',.28,.44,base+'about/group'],
  ['db','DigitalBridge','資金','2026年9月にSBGが買収完了。デジタルインフラの投資・運用会社。',.16,.50,base+'news/press/20260930'],
@@ -109,6 +111,7 @@
  link('sb','jvai',0,'SoftBank側の合弁（C Holdings省略）');link('openai','jvai',0,'合弁');link('openai','jvai',1,'AI製品・技術');['tomakomai','sakai'].forEach(n=>link('sb',n,1,'国内AIデータセンター計画'));['ly','paypay'].forEach(n=>link('sb',n,0,'傘下・間接の資本構造を省略'));link('ly','paypay',0,'共同持株会社等を通じた関係');
  ['robot','skild','agile','onex','autostore','berkshire','balyo'].forEach(n=>link('robohd',n,0,'ロボット関連事業・投資（持分構造省略）'));
  link('sbg','abb',0,'買収契約／完了未確認');link('abb','future',3,'産業ロボットと建設の将来用途');link('skild','future',3,'ロボットの頭脳を使う将来像');link('robot','frameworks',1,'物流自動化を提供');['autostore','berkshire','balyo'].forEach(n=>link(n,'frameworks',1,'公表された物流自動化の組み合わせ'));
+ link('sbg','gulf-fund',2,'新AIファンドの資金調達構想／FT・Reuters報道');link('gulf-investors','gulf-fund',2,'協議の報道／出資確約・調達完了ではない');
  const map=new Map(nodes.map(n=>[n.id,n]));nodes.forEach(n=>{n.degree=edges.filter(e=>e.a===n.id||e.b===n.id).length});
  let chosen=null;let svg;let width=736;const ns='http://www.w3.org/2000/svg';const el=(tag,attrs={})=>{const e=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));return e};
  const colors=['var(--viz-series-1)','var(--viz-series-2)','var(--viz-series-3)','var(--viz-series-4)'];
