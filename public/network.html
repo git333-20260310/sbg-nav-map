@@ -11,8 +11,8 @@
     <label class="form-label" for="sbg-select">企業・計画を選ぶ <select class="form-select" id="sbg-select"></select></label>
   </div>
   <div id="sbg-detail" aria-live="polite"></div>
-  <div class="text-small">2026年10月10日確認／主要関係を抜粋。点の大きさは、この図に載せた接続数。距離・線の太さは持分比率や金額を示しません。</div>
-</aside></div><section aria-label="更新履歴"><h3>更新履歴</h3><p>2026年10月10日：10月9日の新AIファンド構想報道を追加。湾岸投資家との関係は報道の破線で表示。調達完了・個別参加者は未確定。<a href="https://www.reuters.com/world/asia-pacific/softbank-seeks-100-billion-gulf-investors-ft-reports-2026-10-09/" target="_blank" rel="noopener">Reuters（FT報道を紹介）</a></p></section></div>
+  <div class="text-small">2026年10月11日確認／主要関係を抜粋。点の大きさは、この図に載せた接続数。距離・線の太さは持分比率や金額を示しません。</div>
+</aside></div><section aria-label="更新履歴"><h3>更新履歴</h3><p>2026年10月11日：SBG・Grab・PETROSによるサラワクAI／デジタル基盤構想を追加。ジョホールのVantage拠点とは別系統。基本合意に基づく検討段階で、容量・建設決定・稼働時期は未公表。<a href="https://group.softbank/en/news/press/20261008" target="_blank" rel="noopener">SBG公式発表</a></p><p>2026年10月10日：10月9日の新AIファンド構想報道を追加。湾岸投資家との関係は報道の破線で表示。調達完了・個別参加者は未確定。<a href="https://www.reuters.com/world/asia-pacific/softbank-seeks-100-billion-gulf-investors-ft-reports-2026-10-09/" target="_blank" rel="noopener">Reuters（FT報道を紹介）</a></p></section></div>
 <style>
 #sbg-network .sbg-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start}
 #sbg-network .sbg-panel{position:sticky;top:16px;padding:18px;border:1px solid var(--muted-foreground);border-radius:12px;max-height:calc(100vh - 32px);overflow:auto}
@@ -43,7 +43,10 @@
  ['db','DigitalBridge','資金','2026年9月にSBGが買収完了。デジタルインフラの投資・運用会社。',.16,.50,base+'news/press/20260930'],
  ['bank','銀行・外部投資家','資金','外部の資金提供者という関連テーマ。特定の銀行と個別案件の融資契約を示していない。',.08,.59,''],
  ['vantage','Vantage','資金','DigitalBridgeの投資先。運用するファンド等を通じた関係で、SBGの単純な直営拠点と同一視しない。',.10,.43,'https://vantage-dc.com/company/'],
- ['malaysia','マレーシアDC','計画','ジョホール。Vantageが旧Yondrの300MW超キャンパスを取得。Stargateとは別の拠点。',.06,.34,'https://vantage-dc.com/company/'],
+ ['malaysia','マレーシアDC（ジョホール）','計画','ジョホール。Vantageが旧Yondrの300MW超キャンパスを取得。Stargateおよびサラワク構想とは別の拠点。',.06,.34,'https://vantage-dc.com/company/'],
+ ['sarawak','サラワクAI基盤構想','計画','2026年10月8日、SBG・Grab・PETROSがマレーシア・サラワク州のAI／デジタルインフラ基盤を段階的に検討する基本合意を締結。AI計算・サービス、先端技術、ロボット、人材育成などを検討する段階で、容量・建設決定・稼働時期は未公表。',.12,.35,'https://group.softbank/en/news/press/20261008'],
+ ['grab','Grab','外部','東南アジアのデジタル基盤、応用AI、地域の顧客・パートナーネットワークをサラワク構想へ持ち寄る協力企業。',.05,.28,'https://group.softbank/en/news/press/20261008'],
+ ['petros','PETROS','外部','サラワク州営エネルギー会社。現地のエネルギー・インフラ面からサラワク構想に参加。',.18,.29,'https://group.softbank/en/news/press/20261008'],
  ['sbe','SB Energy','インフラ','電力とデータセンターの開発・建設・運営を担うグループ企業。',.38,.29,'https://sbenergy.com/'],
  ['stargate','Stargate','インフラ','OpenAI向けAIインフラのプロジェクト。SBGの子会社という意味の点ではない。拠点ごとに事業者と役割が異なる。',.54,.23,'https://openai.com/index/five-new-stargate-sites/'],
  ['openai','OpenAI','AI','SBG／SVF2の投資先。AIモデルとサービスを開発。',.65,.37,base+'news/press/20260227'],
@@ -98,7 +101,7 @@
  const edges=[];const link=(a,b,type,label)=>edges.push({a,b,type,label});
  ['svf','db','sbe','arm','ampere','graphcore','robohd','sb'].forEach(n=>link('sbg',n,0,'資本・グループ関係（中間会社省略）'));
  link('sbg','openai',0,'SVF2等を通じた投資');link('svf','openai',0,'出資');link('svf','terabase',0,'出資');link('sbg','intel',0,'20億ドルの出資契約');link('sbg','wayve',0,'投資先');link('sbg','tempus',0,'合弁');link('tempusUS','tempus',0,'合弁');
- link('db','vantage',0,'投資先・運用ファンド等を通じた関係');link('vantage','malaysia',1,'旧Yondrジョホール拠点を取得');link('bank','db',3,'外部資金と運用の接点');link('bank','sbe',3,'開発資金という関連テーマ');
+ link('db','vantage',0,'投資先・運用ファンド等を通じた関係');link('vantage','malaysia',1,'旧Yondrジョホール拠点を取得');link('sbg','sarawak',1,'AI・デジタル基盤の段階的検討に関する基本合意');link('grab','sarawak',1,'基本合意／応用AI・地域デジタル基盤');link('petros','sarawak',1,'基本合意／現地エネルギー・インフラ');link('bank','db',3,'外部資金と運用の接点');link('bank','sbe',3,'開発資金という関連テーマ');
  ['sbe','openai','oracle','nvidia','mgx','sbg'].forEach(n=>link(n,'stargate',1,'Stargateに関与（役割・拠点は異なる）'));
  link('sbe','milam',1,'建設・運営');link('openai','milam',1,'計算基盤を利用');link('stargate','milam',1,'拠点');link('stargate','abilene',1,'拠点');link('oracle','abilene',1,'計算基盤');
  ['sbe','openai','nvidia','aep'].forEach(n=>link(n,'ohio',1,'公表された計画への関与'));
