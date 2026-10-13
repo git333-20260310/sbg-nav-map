@@ -11,8 +11,8 @@
     <label class="form-label" for="sbg-select">企業・計画を選ぶ <select class="form-select" id="sbg-select"></select></label>
   </div>
   <div id="sbg-detail" aria-live="polite"></div>
-  <div class="text-small">2026年10月11日確認／主要関係を抜粋。点の大きさは、この図に載せた接続数。距離・線の太さは持分比率や金額を示しません。</div>
-</aside></div><section aria-label="更新履歴"><h3>更新履歴</h3><p>2026年10月11日：SBG・Grab・PETROSによるサラワクAI／デジタル基盤構想を追加。ジョホールのVantage拠点とは別系統。基本合意に基づく検討段階で、容量・建設決定・稼働時期は未公表。<a href="https://group.softbank/en/news/press/20261008" target="_blank" rel="noopener">SBG公式発表</a></p><p>2026年10月10日：10月9日の新AIファンド構想報道を追加。湾岸投資家との関係は報道の破線で表示。調達完了・個別参加者は未確定。<a href="https://www.reuters.com/world/asia-pacific/softbank-seeks-100-billion-gulf-investors-ft-reports-2026-10-09/" target="_blank" rel="noopener">Reuters（FT報道を紹介）</a></p></section></div>
+  <div class="text-small">2026年10月13日確認／主要関係を抜粋。点の大きさは、この図に載せた接続数。距離・線の太さは持分比率や金額を示しません。</div>
+</aside></div><section aria-label="更新履歴"><h3>更新履歴</h3><p>2026年10月13日：10月12日のSoftBank Robotics Singapore・SJ Integrated Solutionsの基本合意を追加。既存建物でのサービスロボット実証とAI施設管理ソフトの共同開発計画。商用提供開始・実証完了とは区別。<a href="https://www.softbankrobotics.com/news/20261012/" target="_blank" rel="noopener">SoftBank Robotics公式発表</a></p><p>2026年10月11日：SBG・Grab・PETROSによるサラワクAI／デジタル基盤構想を追加。ジョホールのVantage拠点とは別系統。基本合意に基づく検討段階で、容量・建設決定・稼働時期は未公表。<a href="https://group.softbank/en/news/press/20261008" target="_blank" rel="noopener">SBG公式発表</a></p><p>2026年10月10日：10月9日の新AIファンド構想報道を追加。湾岸投資家との関係は報道の破線で表示。調達完了・個別参加者は未確定。<a href="https://www.reuters.com/world/asia-pacific/softbank-seeks-100-billion-gulf-investors-ft-reports-2026-10-09/" target="_blank" rel="noopener">Reuters（FT報道を紹介）</a></p></section></div>
 <style>
 #sbg-network .sbg-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start}
 #sbg-network .sbg-panel{position:sticky;top:16px;padding:18px;border:1px solid var(--muted-foreground);border-radius:12px;max-height:calc(100vh - 32px);overflow:auto}
@@ -36,6 +36,9 @@
  const root=document.getElementById('sbg-network'),plot=root.querySelector('.sbg-plot'),select=root.querySelector('#sbg-select'),detail=root.querySelector('#sbg-detail');
  const base='https://group.softbank/en/';
  const nodes=[
+ ["sbr-sg","SBR Singapore","ロボット","SoftBank Roboticsのアジア太平洋地域拠点。2026年10月12日、SJ Integrated Solutionsと建物管理・サービスロボット連携の共同開発に関する基本合意を発表。",0.57,0.65,"https://www.softbankrobotics.com/news/20261012/"],
+ ["sj-is","SJ Integrated Solutions","外部","SJ Groupの建物・施設管理事業。24Kプラットフォームと施設管理の知見を共同開発・実証に提供する協力企業。出資関係を示すものではない。",0.83,0.59,"https://www.softbankrobotics.com/news/20261012/"],
+ ["sg-building","シンガポール建物AI管理","計画","2026年10月12日発表の基本合意。SJ Campusなど既存建物でサービスロボットを実証し、施設管理ソフトとエレベーター・扉・入退室管理などを結ぶ仕組みを共同開発する計画。実証結果を開発に反映し、共同提供を目指す段階。商用提供開始・実証完了は未公表。",0.76,0.59,"https://www.softbankrobotics.com/news/20261012/"],
  ['gulf-fund','新AIファンド構想','報道','2026年10月9日報道。湾岸投資家から最大1,000億ドルの調達を検討し、企業買収とAIによる業務改善に使う構想。FT報道をReutersが紹介。Reutersは独自確認できておらず、調達完了・参加者・持分は未確定。',.23,.55,'https://www.reuters.com/world/asia-pacific/softbank-seeks-100-billion-gulf-investors-ft-reports-2026-10-09/'],
  ['gulf-investors','湾岸投資家','報道','新AIファンド構想で協議相手と報じられた投資家。UAEの有力者との協議報道があるが、個別出資者・金額は確定していない。SVF1の既存出資者と同一とは断定しない。',.10,.64,'https://www.reuters.com/world/asia-pacific/softbank-seeks-100-billion-gulf-investors-ft-reports-2026-10-09/'],
  ['sbg','SoftBank Group','中核','投資とグループ戦略の中心。SoftBank株式会社とは別会社。',.49,.47,base+'about/group'],
@@ -115,6 +118,7 @@
  ['robot','skild','agile','onex','autostore','berkshire','balyo'].forEach(n=>link('robohd',n,0,'ロボット関連事業・投資（持分構造省略）'));
  link('sbg','abb',0,'買収契約／完了未確認');link('abb','future',3,'産業ロボットと建設の将来用途');link('skild','future',3,'ロボットの頭脳を使う将来像');link('robot','frameworks',1,'物流自動化を提供');['autostore','berkshire','balyo'].forEach(n=>link(n,'frameworks',1,'公表された物流自動化の組み合わせ'));
  link('sbg','gulf-fund',2,'新AIファンドの資金調達構想／FT・Reuters報道');link('gulf-investors','gulf-fund',2,'協議の報道／出資確約・調達完了ではない');
+ link('robot','sbr-sg',1,'公表されたAPAC地域拠点');link('sbr-sg','sg-building',1,'基本合意／サービスロボット・SBX');link('sj-is','sg-building',1,'基本合意／24K・施設管理・共同開発');
  const map=new Map(nodes.map(n=>[n.id,n]));nodes.forEach(n=>{n.degree=edges.filter(e=>e.a===n.id||e.b===n.id).length});
  let chosen=null;let svg;let width=736;const ns='http://www.w3.org/2000/svg';const el=(tag,attrs={})=>{const e=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));return e};
  const colors=['var(--viz-series-1)','var(--viz-series-2)','var(--viz-series-3)','var(--viz-series-4)'];
