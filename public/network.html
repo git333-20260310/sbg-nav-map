@@ -1,6 +1,9 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SBGのネットワーク図</title><style>:root{--background:#fff;--foreground:#202733;--muted-foreground:#637182;--viz-series-1:#2677b6;--viz-series-2:#16877d;--viz-series-3:#b97913;--viz-series-4:#9055a7;--font-size-base:14px}*{box-sizing:border-box}body{margin:0;padding:24px;font-family:system-ui,sans-serif;background:var(--background);color:var(--foreground)}h2{font-size:23px;font-weight:500}.viz-row{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin:12px 0}.text-small{font-size:12px;color:var(--muted-foreground)}select,button{font:inherit;padding:7px 10px;border:1px solid #ccd3db;border-radius:6px;background:var(--background);color:var(--foreground)}button{cursor:pointer}a{color:var(--viz-series-1)}@media(prefers-color-scheme:dark){:root{--background:#161b23;--foreground:#e4e8ed;--muted-foreground:#a2adba;--viz-series-1:#72b7ed;--viz-series-2:#65c9ba;--viz-series-3:#edb65c;--viz-series-4:#c799e3}}</style></head><body><div id="sbg-network">
   <h2>SBGの企業・計画・話題のネットワーク</h2>
-  <div class="viz-row text-small" aria-label="線の凡例">
+  <style>#sbg-network [hidden]{display:none!important}.wclock{width:min(100%,700px);aspect-ratio:1;margin:1em auto;border-radius:50%;background:conic-gradient(from -60deg,#ffdad8 0 120deg,#d8dce1 120deg 240deg,#c6e2ff 240deg);position:relative;color:#18283c}.wsector{position:absolute;width:40%;text-align:center;transform:translate(-50%,-50%)}.wsector b{display:block}.wsector button{font-size:clamp(11px,2vw,15px);margin:2px;padding:3px 6px}.wmodes [aria-pressed=true]{background:#264964;color:white}</style>
+<nav class="wmodes" aria-label="図の表示切替"><button id="relationsMode" aria-pressed="true">関係で見る</button> <button id="weatherMode" aria-pressed="false">雲行きで見る</button></nav>
+<section id="weatherPanel" hidden><h3>主要案件の空模様</h3><p>案件名を選ぶと理由と関係先が表示されます。天気は進捗の見立てで、企業の評価や株価予想ではありません。</p><div class="wclock"><div class="wsector" style="left:50%;top:24%"><b>☀ 晴れ</b></div><div class="wsector" style="left:73%;top:62%"><b>☁ 曇り</b></div><div class="wsector" style="left:27%;top:62%"><b>☂ 雨</b></div></div><div class="wunknown"><b>未判定</b> </div><p id="weatherDetail" aria-live="polite">案件を選んでください。</p></section>
+<div class="viz-row text-small" aria-label="線の凡例">
     <span class="sbg-key" style="--k:var(--viz-series-1)">━ 資本・投資</span>
     <span class="sbg-key" style="--k:var(--viz-series-2)">━ 公表された参加・技術関係</span>
     <span class="sbg-key" style="--k:var(--viz-series-3)">┄ 報道</span>
@@ -218,6 +221,21 @@ link('openai','oracle',1,'OpenAIモデル・ChatGPT・CodexとOracle業務アプ
  edges.forEach(e=>{const a=p.get(e.a),b=p.get(e.b);const active=chosen&&(e.a===chosen||e.b===chosen);const path=el('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:colors[e.type],opacity:chosen?(active?1:.10):.45,'stroke-width':active?2:1.2,...(e.type>=2?{'stroke-dasharray':'5 4'}:{})});path.classList.add('sbg-edge');svg.appendChild(path);if(updatedEdges.has(e.a+':'+e.b))glow(path,[{opacity:.55,strokeWidth:2},{opacity:1,strokeWidth:5},{opacity:.55,strokeWidth:2}])});
  positions.forEach(({n,x,y})=>{const degree=n.degree;const r=Math.min(16,4+Math.sqrt(degree)*2);const g=el('g',{transform:'translate('+x+' '+y+')',opacity:adjacent.has(n.id)?1:.22});g.classList.add('sbg-node','cursor-interaction');const hit=el('circle',{r:22,fill:'transparent'});g.appendChild(hit);const circle=el('circle',{r,fill:groupColor(n)});g.appendChild(circle);const text=el('text',{x:0,y:r+15,'text-anchor':'middle'});text.textContent=n.name;if(x<90){text.setAttribute('text-anchor','start');text.setAttribute('x',-r)}else if(x>width-100){text.setAttribute('text-anchor','end');text.setAttribute('x',r)}
  if(updated.has(n.id)&&performance.now()<end){g.setAttribute("opacity","1");const ring=el("circle",{r:r+5,fill:"none",stroke:"#d58c13","stroke-width":3,"pointer-events":"none"});g.appendChild(ring);glow(ring,[{opacity:.25},{opacity:1},{opacity:.25}])}const show=updated.has(n.id)||width>=600||n.degree>=5||adjacent.has(n.id)&&chosen||n.id==='malaysia'||n.id==='noetra'||n.id==='rapidus';if(show){text.classList.add('sbg-secondary');g.appendChild(text)}const title=el('title');title.textContent=n.name+'：'+n.description;g.appendChild(title);g.addEventListener('click',e=>{e.stopPropagation();pick(n.id)});svg.appendChild(g)});plot.replaceChildren(svg)}
+ const panel=root.querySelector('#weatherPanel'), modes=[root.querySelector('#relationsMode'),root.querySelector('#weatherMode')];
+ function mode(w){panel.hidden=!w;root.querySelector('.sbg-layout').hidden=w;root.querySelector('[aria-label="線の凡例"]').hidden=w;modes.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===Number(w))));if(!w)draw()}
+ modes.forEach((b,i)=>b.onclick=()=>mode(Boolean(i)));
+ const sectors=[...panel.querySelectorAll('.wsector'),panel.querySelector('.wunknown')];
+ const cases=[
+ [0,'arm-hpc26','Arm系スパコン','上位10台中4台で採用。AGI CPUの受注とは別。','Arm'],
+ [0,'agile','ロボット資金調達','シリーズFの調達が完了。','Agile Robots、SBG'],
+ [0,'sarawak','サラワク共同開発','共同開発契約を締結。建設・稼働は今後。','SBG、Grab、PETROS'],
+ [1,'rapidus','千歳の2nm量産','量産目標を維持する一方、遅延リスクの報道あり。','Rapidus、SoftBank株式会社'],
+ [1,'uae','UAEのAI拠点','公表済みのクラスター計画。計画容量と稼働容量は別。','G42、OpenAI、Oracle'],
+ [1,'france','フランスDC開発','開発計画の段階。計画規模は稼働実績ではない。','SBG、Sesterce'],
+ [2,'sb7-procurement','米国発電設備調達','調達見直しで損失。オハイオ計画の中止ではない。','Silver Bands 7、SBG'],
+ [2,'abb','ABB事業買収','中国事業の取得が禁止され、取引全体は協議中。','ABB、SBG'],
+ [3,'roze','建設ロボット新会社構想','報道段階で採用契約は未確認。','Roze']];
+ cases.forEach(([i,id,label,reason,who])=>{const n=map.get(id);if(!n)return;const b=document.createElement('button');b.textContent=label;sectors[i].append(b);b.onclick=()=>{const d=panel.querySelector('#weatherDetail');d.textContent=label+'｜'+reason+'　関係先：'+who+'　';if(n.url){const a=document.createElement('a');a.href=n.url;a.textContent='関連資料';d.append(a)} }});
  select.addEventListener('change',()=>pick(select.value));new ResizeObserver(()=>draw()).observe(plot);pick('sbg');setTimeout(draw,duration*3+30);
 })();
 </script>
